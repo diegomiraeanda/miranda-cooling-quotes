@@ -64,6 +64,15 @@ export const quotes: Quote[] = [
     number: "RM0001-23",
     date: "2023-12-10",
     customerId: "1",
+    customerName: "Empresa ABC Ltda.",
+    customerAddress: "Av. Principal, 123, Centro",
+    customerPhone: "(11) 9999-8888",
+    customerEmail: "contato@empresaabc.com",
+    deviceType: "Ar-condicionado Split",
+    deviceBrand: "LG",
+    deviceModel: "Inverter 12000 BTUs",
+    deviceSerialNumber: "LG123456789",
+    voltage: "220v",
     customer: customers[0],
     items: [
       {
@@ -87,13 +96,30 @@ export const quotes: Quote[] = [
     tax: 145,
     total: 1595,
     notes: "Serviço agendado para 15/12/2023",
-    status: "approved"
+    status: "approved",
+    companyInfo: {
+      name: "Refrigeração Miranda",
+      shortName: "RM",
+      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
+      phone: "(00) 9999-8888",
+      email: "contato@refrigeracaomiranda.com.br",
+      taxId: "CNPJ: 12.345.678/0001-99"
+    }
   },
   {
     id: "2",
     number: "RM0002-23",
     date: "2023-12-15",
     customerId: "2",
+    customerName: "Restaurante Sabor Certo",
+    customerAddress: "Rua das Flores, 456, Jardim",
+    customerPhone: "(11) 3333-2222",
+    customerEmail: "admin@saborcerto.com",
+    deviceType: "Freezer Comercial",
+    deviceBrand: "Metalfrio",
+    deviceModel: "VF55D",
+    deviceSerialNumber: "MF987654321",
+    voltage: "110v",
     customer: customers[1],
     items: [
       {
@@ -109,13 +135,30 @@ export const quotes: Quote[] = [
     tax: 60,
     total: 660,
     notes: "Cliente solicitou urgência",
-    status: "sent"
+    status: "sent",
+    companyInfo: {
+      name: "Refrigeração Miranda",
+      shortName: "RM",
+      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
+      phone: "(00) 9999-8888",
+      email: "contato@refrigeracaomiranda.com.br",
+      taxId: "CNPJ: 12.345.678/0001-99"
+    }
   },
   {
     id: "3",
     number: "RM0003-23",
     date: "2023-12-20",
     customerId: "3",
+    customerName: "Supermercado Economia",
+    customerAddress: "Av. Comercial, 789, Vila Nova",
+    customerPhone: "(11) 7777-6666",
+    customerEmail: "compras@economia.com",
+    deviceType: "Câmara Fria",
+    deviceBrand: "Danfoss",
+    deviceModel: "CF-2000",
+    deviceSerialNumber: "DF123987456",
+    voltage: "220v",
     customer: customers[2],
     items: [
       {
@@ -139,6 +182,14 @@ export const quotes: Quote[] = [
     tax: 95,
     total: 1045,
     notes: "Garantia de 6 meses para o serviço",
-    status: "draft"
+    status: "draft",
+    companyInfo: {
+      name: "Refrigeração Miranda",
+      shortName: "RM",
+      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
+      phone: "(00) 9999-8888",
+      email: "contato@refrigeracaomiranda.com.br",
+      taxId: "CNPJ: 12.345.678/0001-99"
+    }
   }
 ];

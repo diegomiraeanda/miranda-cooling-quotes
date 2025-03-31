@@ -70,7 +70,7 @@ const PrintQuote = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -139,6 +139,48 @@ const PrintQuote = () => {
               <span className="font-medium text-gray-700">Data: </span>
               {format(new Date(quote.date), "dd/MM/yyyy", { locale: ptBR })}
             </p>
+          </div>
+        </div>
+
+        {/* Equipment Information */}
+        <div className="mb-6 border p-4 rounded-md">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">
+            INFORMAÇÕES DO APARELHO
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-600">
+                <span className="font-medium text-gray-700">Aparelho: </span>
+                {quote.deviceType || "-"}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium text-gray-700">Marca: </span>
+                {quote.deviceBrand || "-"}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium text-gray-700">Modelo: </span>
+                {quote.deviceModel || "-"}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-600">
+                <span className="font-medium text-gray-700">Nº de Série: </span>
+                {quote.deviceSerialNumber || "-"}
+              </p>
+              <p className="text-gray-600">
+                <span className="font-medium text-gray-700">Voltagem: </span>
+                <span className="flex items-center mt-1">
+                  <span className={`inline-flex items-center mr-2`}>
+                    <span className={`w-4 h-4 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "110v" ? "bg-black" : "bg-white"}`}></span>
+                    110V
+                  </span>
+                  <span className={`inline-flex items-center`}>
+                    <span className={`w-4 h-4 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "220v" ? "bg-black" : "bg-white"}`}></span>
+                    220V
+                  </span>
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -228,6 +270,32 @@ const PrintQuote = () => {
             <p className="text-gray-700">{quote.notes}</p>
           </div>
         )}
+
+        {/* Payment and Warranty Terms */}
+        <div className="mt-8 border-t border-gray-200 pt-4">
+          <p className="text-gray-700 mb-2">
+            O pagamento do conserto deve ser feito no ato. Este é o seu comprovante. Por gentileza, queira conferir a importância com a marca no original e pagar no caixa ou ao nosso Técnico.
+          </p>
+          <p className="text-gray-900 font-bold">
+            Prazo de retirada da mercadoria em 90 (noventa) dias.
+          </p>
+        </div>
+
+        {/* Customer Receipt Confirmation */}
+        <div className="mt-8 border-t border-gray-200 pt-4">
+          <p className="text-gray-700">
+            Declaro ter recebido o aparelho em perfeito estado e funcionando, com garantia de 90 dias a partir da data abaixo.
+          </p>
+          <div className="mt-10 flex justify-between items-end">
+            <div className="w-2/3 border-t border-gray-400">
+              <p className="text-center text-sm text-gray-600 mt-1">Assinatura do Cliente</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">{format(new Date(), "dd/MM/yyyy", { locale: ptBR })}</p>
+              <p className="text-center text-sm text-gray-600 mt-1">Data</p>
+            </div>
+          </div>
+        </div>
 
         {/* Footer */}
         <div className="mt-12 text-center text-sm text-gray-500 print:mt-16">

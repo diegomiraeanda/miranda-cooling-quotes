@@ -31,6 +31,12 @@ export interface Quote {
   customerAddress?: string; // Direct customer address entry
   customerPhone?: string; // Direct customer phone entry
   customerEmail?: string; // Direct customer email entry
+  // New equipment fields
+  deviceType?: string; // Type of device/equipment
+  deviceBrand?: string; // Brand of the device
+  deviceModel?: string; // Model of the device
+  deviceSerialNumber?: string; // Serial number
+  voltage?: "110v" | "220v" | ""; // Voltage selection
   customer?: Customer;  // Optional
   items: QuoteItem[];
   subtotal: number;

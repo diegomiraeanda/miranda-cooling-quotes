@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,6 +28,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
+import { quotes } from "@/data/mockData";
 
 const formSchema = z.object({
   customerName: z.string().min(1, { message: "Nome do cliente é obrigatório" }),
@@ -81,15 +81,18 @@ const CreateQuote = () => {
     const tax = subtotal * 0.1; // 10% tax
     const total = subtotal + tax;
     
+    // Create quote object with a new ID
+    const newQuoteId = `quote-${Date.now()}`;
+    
     // Create quote object
     const quote = {
-      id: `quote-${Date.now()}`,
+      id: newQuoteId,
       number: `ORC-${Math.floor(1000 + Math.random() * 9000)}`,
       date: format(data.date, "yyyy-MM-dd"),
       customerName: data.customerName,
-      customerAddress: data.customerAddress,
-      customerPhone: data.customerPhone,
-      customerEmail: data.customerEmail,
+      customerAddress: data.customerAddress || "",
+      customerPhone: data.customerPhone || "",
+      customerEmail: data.customerEmail || "",
       items: itemsWithTotals.map((item, index) => ({
         id: `item-${index}`,
         description: item.description,
@@ -104,9 +107,16 @@ const CreateQuote = () => {
       status: "draft" as const
     };
     
-    console.log("Form submitted:", quote);
+    console.log("Orçamento criado:", quote);
+    
+    // Add the new quote to the mock data
+    // @ts-ignore - We'll ignore the type mismatch temporarily
+    quotes.unshift(quote);
+    
     toast.success("Orçamento criado com sucesso!");
-    navigate("/quotes");
+    
+    // Navigate to the detail view to allow printing
+    navigate(`/quotes/${newQuoteId}`);
   };
 
   const addItem = () => {

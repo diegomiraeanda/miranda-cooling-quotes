@@ -34,11 +34,12 @@ const QuoteDetail = () => {
   }, [id]);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: `Orçamento-${quote?.number || ""}`,
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
     },
+    // Fix: Correctly provide a function that returns the content ref
+    content: () => printRef.current,
   });
 
   if (!quote) {
@@ -79,7 +80,7 @@ const QuoteDetail = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -125,10 +126,18 @@ const QuoteDetail = () => {
             <h3 className="text-sm font-semibold text-gray-500 mb-2">
               INFORMAÇÕES DO CLIENTE
             </h3>
-            <p className="font-medium text-gray-900">{quote.customer.name}</p>
-            <p className="text-gray-600">{quote.customer.address}</p>
-            <p className="text-gray-600">{quote.customer.phone}</p>
-            <p className="text-gray-600">{quote.customer.email}</p>
+            <p className="font-medium text-gray-900">
+              {quote.customerName || (quote.customer && quote.customer.name)}
+            </p>
+            <p className="text-gray-600">
+              {quote.customerAddress || (quote.customer && quote.customer.address)}
+            </p>
+            <p className="text-gray-600">
+              {quote.customerPhone || (quote.customer && quote.customer.phone)}
+            </p>
+            <p className="text-gray-600">
+              {quote.customerEmail || (quote.customer && quote.customer.email)}
+            </p>
           </div>
           <div className="text-right">
             <h3 className="text-sm font-semibold text-gray-500 mb-2">

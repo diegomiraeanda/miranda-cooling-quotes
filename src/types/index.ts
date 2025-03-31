@@ -15,8 +15,8 @@ export interface Service {
 
 export interface QuoteItem {
   id: string;
-  serviceId?: string;  // Now optional
-  description: string; // Now we'll use this directly
+  serviceId?: string;  // Optional
+  description: string; // Use this directly
   quantity: number;
   unitPrice: number;
   total: number;
@@ -26,12 +26,12 @@ export interface Quote {
   id: string;
   number: string;
   date: string;
-  customerId?: string;  // Now optional
-  customerName: string; // New field for direct customer name entry
-  customerAddress?: string; // New field for direct customer address entry
-  customerPhone?: string; // New field for direct customer phone entry
-  customerEmail?: string; // New field for direct customer email entry
-  customer?: Customer;  // Now optional
+  customerId?: string;  // Optional
+  customerName: string; // Required field for direct customer name entry
+  customerAddress?: string; // Direct customer address entry
+  customerPhone?: string; // Direct customer phone entry
+  customerEmail?: string; // Direct customer email entry
+  customer?: Customer;  // Optional
   items: QuoteItem[];
   subtotal: number;
   tax: number;

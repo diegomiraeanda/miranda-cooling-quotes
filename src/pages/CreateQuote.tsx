@@ -1,12 +1,5 @@
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -19,17 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plus, Trash2 } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Printer, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
-import { quotes } from "@/data/mockData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Define the schema for our form
 const formSchema = z.object({
   customerName: z.string().min(1, { message: "Nome do cliente é obrigatório" }),
   customerAddress: z.string().optional(),
@@ -47,6 +41,18 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+// Company info (hardcoded as requested)
+const COMPANY_INFO = {
+  name: "Refrigeração Miranda",
+  shortName: "RM",
+  address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
+  phone: "(00) 9999-8888",
+  email: "contato@refrigeracaomiranda.com.br",
+  taxId: "CNPJ: 12.345.678/0001-99"
+};
+
+const quotes: any[] = [];
 
 const CreateQuote = () => {
   const navigate = useNavigate();
@@ -74,6 +80,7 @@ const CreateQuote = () => {
     // Calculate totals
     const itemsWithTotals = data.items.map(item => ({
       ...item,
+      id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       total: item.quantity * item.unitPrice
     }));
     
@@ -93,35 +100,29 @@ const CreateQuote = () => {
       customerAddress: data.customerAddress || "",
       customerPhone: data.customerPhone || "",
       customerEmail: data.customerEmail || "",
-      items: itemsWithTotals.map((item, index) => ({
-        id: `item-${index}`,
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        total: item.total
-      })),
+      items: itemsWithTotals,
       subtotal,
       tax,
       total,
       notes: data.notes || "",
-      status: "draft" as const
+      status: "draft" as const,
+      companyInfo: COMPANY_INFO
     };
     
     console.log("Orçamento criado:", quote);
     
-    // Add the new quote to the mock data
-    // @ts-ignore - We'll ignore the type mismatch temporarily
-    quotes.unshift(quote);
+    // Add to our quotes array
+    quotes.push(quote);
     
     toast.success("Orçamento criado com sucesso!");
     
-    // Navigate to the detail view to allow printing
-    navigate(`/quotes/${newQuoteId}`);
+    // Navigate to print view
+    navigate(`/print/${newQuoteId}`);
   };
 
   const addItem = () => {
     const newItem = {
-      id: `item-${items.length + 1}`,
+      id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       description: "",
       quantity: 1,
       unitPrice: 0
@@ -150,7 +151,18 @@ const CreateQuote = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+      {/* Company Header */}
+      <div className="flex items-center bg-white p-4 mb-6 shadow-sm rounded-lg">
+        <div className="w-12 h-12 bg-cooling-700 rounded-md flex items-center justify-center">
+          <span className="text-white font-bold text-xl">{COMPANY_INFO.shortName}</span>
+        </div>
+        <div className="ml-4">
+          <h1 className="font-bold text-cooling-800 text-xl">{COMPANY_INFO.name}</h1>
+          <p className="text-sm text-cooling-600">Soluções em Refrigeração</p>
+        </div>
+      </div>
+
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Novo Orçamento</h1>
         <p className="text-gray-600 mt-1">
@@ -159,14 +171,11 @@ const CreateQuote = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Informações do Cliente</CardTitle>
-                <CardDescription>
-                  Preencha os dados do cliente
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
@@ -289,12 +298,7 @@ const CreateQuote = () => {
             <div className="space-y-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle>Itens do Orçamento</CardTitle>
-                    <CardDescription>
-                      Adicione os produtos/serviços ao orçamento
-                    </CardDescription>
-                  </div>
+                  <CardTitle>Itens do Orçamento</CardTitle>
                   <Button
                     type="button"
                     onClick={addItem}
@@ -398,7 +402,7 @@ const CreateQuote = () => {
                 <CardHeader>
                   <CardTitle>Resumo</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
@@ -440,15 +444,12 @@ const CreateQuote = () => {
                       </span>
                     </div>
                   </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Link to="/quotes">
-                    <Button variant="outline">Cancelar</Button>
-                  </Link>
-                  <Button type="submit" className="bg-cooling-600 hover:bg-cooling-700">
-                    Criar Orçamento
+                  
+                  <Button type="submit" className="w-full bg-cooling-600 hover:bg-cooling-700 mt-4">
+                    <Printer className="mr-2 h-4 w-4" />
+                    Criar e Imprimir Orçamento
                   </Button>
-                </CardFooter>
+                </CardContent>
               </Card>
             </div>
           </div>
@@ -458,4 +459,6 @@ const CreateQuote = () => {
   );
 };
 
+// Export the quotes array so the PrintQuote component can access it
+export { quotes };
 export default CreateQuote;

@@ -38,4 +38,12 @@ export interface Quote {
   total: number;
   notes: string;
   status: "draft" | "sent" | "approved" | "rejected";
+  companyInfo?: {
+    name: string;
+    shortName: string;
+    address: string;
+    phone: string;
+    email: string;
+    taxId: string;
+  };
 }

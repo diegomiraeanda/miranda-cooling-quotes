@@ -17,15 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { customers, services } from "@/data/mockData";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Plus, Trash2 } from "lucide-react";
@@ -39,13 +31,17 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 const formSchema = z.object({
-  customer: z.string().min(1, { message: "Cliente é obrigatório" }),
+  customerName: z.string().min(1, { message: "Nome do cliente é obrigatório" }),
+  customerAddress: z.string().optional(),
+  customerPhone: z.string().optional(),
+  customerEmail: z.string().email({ message: "E-mail inválido" }).optional().or(z.literal('')),
   date: z.date({ required_error: "Data é obrigatória" }),
   notes: z.string().optional(),
   items: z.array(
     z.object({
-      serviceId: z.string().min(1, { message: "Serviço é obrigatório" }),
+      description: z.string().min(1, { message: "Descrição do serviço/produto é obrigatória" }),
       quantity: z.number().min(1, { message: "Quantidade deve ser maior que 0" }),
+      unitPrice: z.number().min(0, { message: "Preço deve ser maior ou igual a 0" }),
     })
   ).min(1, { message: "Adicione pelo menos um item" }),
 });
@@ -54,23 +50,61 @@ type FormValues = z.infer<typeof formSchema>;
 
 const CreateQuote = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState<{ id: string; serviceId: string; quantity: number }[]>(
-    [{ id: "1", serviceId: "", quantity: 1 }]
-  );
+  const [items, setItems] = useState<{ 
+    id: string; 
+    description: string; 
+    quantity: number; 
+    unitPrice: number 
+  }[]>([{ id: "1", description: "", quantity: 1, unitPrice: 0 }]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customer: "",
+      customerName: "",
+      customerAddress: "",
+      customerPhone: "",
+      customerEmail: "",
       date: new Date(),
       notes: "",
-      items: [{ serviceId: "", quantity: 1 }],
+      items: [{ description: "", quantity: 1, unitPrice: 0 }],
     },
   });
 
   const onSubmit = (data: FormValues) => {
-    // In a real application, we would send this data to an API
-    console.log("Form submitted:", data);
+    // Calculate totals
+    const itemsWithTotals = data.items.map(item => ({
+      ...item,
+      total: item.quantity * item.unitPrice
+    }));
+    
+    const subtotal = itemsWithTotals.reduce((sum, item) => sum + item.total, 0);
+    const tax = subtotal * 0.1; // 10% tax
+    const total = subtotal + tax;
+    
+    // Create quote object
+    const quote = {
+      id: `quote-${Date.now()}`,
+      number: `ORC-${Math.floor(1000 + Math.random() * 9000)}`,
+      date: format(data.date, "yyyy-MM-dd"),
+      customerName: data.customerName,
+      customerAddress: data.customerAddress,
+      customerPhone: data.customerPhone,
+      customerEmail: data.customerEmail,
+      items: itemsWithTotals.map((item, index) => ({
+        id: `item-${index}`,
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        total: item.total
+      })),
+      subtotal,
+      tax,
+      total,
+      notes: data.notes || "",
+      status: "draft" as const
+    };
+    
+    console.log("Form submitted:", quote);
     toast.success("Orçamento criado com sucesso!");
     navigate("/quotes");
   };
@@ -78,11 +112,12 @@ const CreateQuote = () => {
   const addItem = () => {
     const newItem = {
       id: `item-${items.length + 1}`,
-      serviceId: "",
+      description: "",
       quantity: 1,
+      unitPrice: 0
     };
     setItems([...items, newItem]);
-    form.setValue('items', [...form.getValues('items'), { serviceId: "", quantity: 1 }]);
+    form.setValue('items', [...form.getValues('items'), { description: "", quantity: 1, unitPrice: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -98,14 +133,10 @@ const CreateQuote = () => {
     form.setValue('items', formItems);
   };
 
-  const getServiceNameById = (id: string) => {
-    const service = services.find(s => s.id === id);
-    return service ? service.description : '';
-  };
-
-  const getServicePriceById = (id: string) => {
-    const service = services.find(s => s.id === id);
-    return service ? service.price : 0;
+  const calculateItemTotal = (index: number) => {
+    const quantity = form.watch(`items.${index}.quantity`) || 0;
+    const unitPrice = form.watch(`items.${index}.unitPrice`) || 0;
+    return quantity * unitPrice;
   };
 
   return (
@@ -122,35 +153,63 @@ const CreateQuote = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Informações do Orçamento</CardTitle>
+                <CardTitle>Informações do Cliente</CardTitle>
                 <CardDescription>
-                  Preencha as informações básicas do orçamento
+                  Preencha os dados do cliente
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="customer"
+                  name="customerName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cliente</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um cliente" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {customers.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome do cliente" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="customerAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Endereço</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Endereço do cliente" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="customerPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Telefone do cliente" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="customerEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail</FormLabel>
+                      <FormControl>
+                        <Input placeholder="E-mail do cliente" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -223,7 +282,7 @@ const CreateQuote = () => {
                   <div>
                     <CardTitle>Itens do Orçamento</CardTitle>
                     <CardDescription>
-                      Adicione os serviços ao orçamento
+                      Adicione os produtos/serviços ao orçamento
                     </CardDescription>
                   </div>
                   <Button
@@ -256,30 +315,13 @@ const CreateQuote = () => {
                       <div className="mt-3 space-y-4">
                         <FormField
                           control={form.control}
-                          name={`items.${index}.serviceId`}
+                          name={`items.${index}.description`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Serviço</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Selecione um serviço" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {services.map((service) => (
-                                    <SelectItem key={service.id} value={service.id}>
-                                      {service.description} - {new Intl.NumberFormat("pt-BR", {
-                                        style: "currency",
-                                        currency: "BRL",
-                                      }).format(service.price)}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              <FormLabel>Descrição</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Descrição do serviço ou produto" {...field} />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -304,35 +346,37 @@ const CreateQuote = () => {
                           )}
                         />
 
-                        {form.watch(`items.${index}.serviceId`) && (
-                          <div className="pt-2">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Serviço:</span>
-                              <span className="text-gray-700">{getServiceNameById(form.watch(`items.${index}.serviceId`))}</span>
-                            </div>
-                            <div className="flex justify-between text-sm mt-1">
-                              <span className="text-gray-500">Valor unitário:</span>
-                              <span className="text-gray-700">
-                                {new Intl.NumberFormat("pt-BR", {
-                                  style: "currency",
-                                  currency: "BRL",
-                                }).format(getServicePriceById(form.watch(`items.${index}.serviceId`)))}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-sm font-medium mt-1">
-                              <span className="text-gray-800">Total do item:</span>
-                              <span className="text-gray-800">
-                                {new Intl.NumberFormat("pt-BR", {
-                                  style: "currency",
-                                  currency: "BRL",
-                                }).format(
-                                  getServicePriceById(form.watch(`items.${index}.serviceId`)) * 
-                                  (form.watch(`items.${index}.quantity`) || 0)
-                                )}
-                              </span>
-                            </div>
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.unitPrice`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Preço Unitário (R$)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="pt-2">
+                          <div className="flex justify-between text-sm font-medium mt-1">
+                            <span className="text-gray-800">Total do item:</span>
+                            <span className="text-gray-800">
+                              {new Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              }).format(calculateItemTotal(index))}
+                            </span>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -354,10 +398,7 @@ const CreateQuote = () => {
                           currency: "BRL",
                         }).format(
                           items.reduce((acc, item, index) => {
-                            const serviceId = form.watch(`items.${index}.serviceId`);
-                            const quantity = form.watch(`items.${index}.quantity`) || 0;
-                            if (!serviceId) return acc;
-                            return acc + (getServicePriceById(serviceId) * quantity);
+                            return acc + calculateItemTotal(index);
                           }, 0)
                         )}
                       </span>
@@ -370,10 +411,7 @@ const CreateQuote = () => {
                           currency: "BRL",
                         }).format(
                           items.reduce((acc, item, index) => {
-                            const serviceId = form.watch(`items.${index}.serviceId`);
-                            const quantity = form.watch(`items.${index}.quantity`) || 0;
-                            if (!serviceId) return acc;
-                            return acc + (getServicePriceById(serviceId) * quantity * 0.1);
+                            return acc + (calculateItemTotal(index) * 0.1);
                           }, 0)
                         )}
                       </span>
@@ -386,10 +424,7 @@ const CreateQuote = () => {
                           currency: "BRL",
                         }).format(
                           items.reduce((acc, item, index) => {
-                            const serviceId = form.watch(`items.${index}.serviceId`);
-                            const quantity = form.watch(`items.${index}.quantity`) || 0;
-                            if (!serviceId) return acc;
-                            return acc + (getServicePriceById(serviceId) * quantity * 1.1);
+                            return acc + (calculateItemTotal(index) * 1.1);
                           }, 0)
                         )}
                       </span>

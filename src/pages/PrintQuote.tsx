@@ -30,7 +30,8 @@ const PrintQuote = () => {
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
     },
-    content: () => printRef.current,
+    // The updated syntax uses a function that returns the ref
+    printableElement: () => printRef.current,
   });
 
   if (!quote) {
@@ -70,7 +71,7 @@ const PrintQuote = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />

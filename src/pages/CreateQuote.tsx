@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Define the schema for our form
 const formSchema = z.object({
@@ -29,7 +30,18 @@ const formSchema = z.object({
   customerAddress: z.string().optional(),
   customerPhone: z.string().optional(),
   customerEmail: z.string().email({ message: "E-mail inválido" }).optional().or(z.literal('')),
+  customerCity: z.string().optional(),
+  customerState: z.string().optional(),
   date: z.date({ required_error: "Data é obrigatória" }),
+  
+  // Equipment fields
+  deviceType: z.string().optional(),
+  deviceBrand: z.string().optional(),
+  deviceModel: z.string().optional(),
+  deviceSerialNumber: z.string().optional(),
+  purchaseDate: z.string().optional(),
+  voltage: z.enum(["110v", "220v", ""]).optional(),
+  
   notes: z.string().optional(),
   items: z.array(
     z.object({
@@ -70,6 +82,14 @@ const CreateQuote = () => {
       customerAddress: "",
       customerPhone: "",
       customerEmail: "",
+      customerCity: "",
+      customerState: "",
+      deviceType: "",
+      deviceBrand: "",
+      deviceModel: "",
+      deviceSerialNumber: "",
+      purchaseDate: "",
+      voltage: "",
       date: new Date(),
       notes: "",
       items: [{ description: "", quantity: 1, unitPrice: 0 }],
@@ -100,7 +120,22 @@ const CreateQuote = () => {
       customerAddress: data.customerAddress || "",
       customerPhone: data.customerPhone || "",
       customerEmail: data.customerEmail || "",
+      customerCity: data.customerCity || "",
+      customerState: data.customerState || "",
+      
+      // Device information
+      deviceType: data.deviceType || "",
+      deviceBrand: data.deviceBrand || "",
+      deviceModel: data.deviceModel || "",
+      deviceSerialNumber: data.deviceSerialNumber || "",
+      purchaseDate: data.purchaseDate || "",
+      voltage: data.voltage || "",
+      
       items: itemsWithTotals,
+      
+      // Cost breakdown (required fields from the type)
+      partsCost: subtotal, // Default to subtotal for now
+      laborCost: 0,        // Default to 0
       subtotal,
       tax,
       total,
@@ -205,6 +240,36 @@ const CreateQuote = () => {
                     </FormItem>
                   )}
                 />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="customerCity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cidade</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Cidade" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="customerState"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Estado</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Estado" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -275,7 +340,116 @@ const CreateQuote = () => {
                     </FormItem>
                   )}
                 />
-
+              </CardContent>
+            </Card>
+            
+            {/* Equipment Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações do Aparelho</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="deviceType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Aparelho</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ar Condicionado, Geladeira, etc." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="deviceBrand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marca</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Samsung, LG, etc." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="deviceModel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Modelo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Número do modelo" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="deviceSerialNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Série</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Número de série do aparelho" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="purchaseDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Compra</FormLabel>
+                      <FormControl>
+                        <Input placeholder="DD/MM/AAAA" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="voltage"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Voltagem</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex space-x-4"
+                        >
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <RadioGroupItem value="110v" />
+                            </FormControl>
+                            <FormLabel className="cursor-pointer">110V</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-2">
+                            <FormControl>
+                              <RadioGroupItem value="220v" />
+                            </FormControl>
+                            <FormLabel className="cursor-pointer">220V</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="notes"
@@ -295,7 +469,7 @@ const CreateQuote = () => {
               </CardContent>
             </Card>
 
-            <div className="space-y-6">
+            <div className="space-y-6 lg:col-span-2">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle>Itens do Orçamento</CardTitle>

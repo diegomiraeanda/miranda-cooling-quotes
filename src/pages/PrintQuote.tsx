@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Printer, Download } from "lucide-react";
@@ -7,7 +6,7 @@ import { toast } from "sonner";
 import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { quotes } from "./CreateQuote";
+import { quotes } from "@/data/mockData";
 import { Quote } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +29,24 @@ const PrintQuote = () => {
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
     },
-    content: () => printRef.current,
+    onPrintError: (err) => {
+      toast.error("Erro ao imprimir", { description: err?.message });
+    },
+    print: (iframe) => {
+      const document = iframe?.contentDocument;
+      if (document) {
+        const html = document.getElementsByTagName("html")[0];
+        html.style.fontSize = "12px";
+        const promise = new Promise<void>((resolve) => {
+          setTimeout(() => {
+            window.print();
+            resolve();
+          }, 250);
+        });
+        return promise;
+      }
+      return Promise.resolve();
+    }
   });
 
   if (!quote) {
@@ -70,7 +86,11 @@ const PrintQuote = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={() => handlePrint()}
+            onClick={() => {
+              if (printRef.current) {
+                handlePrint(printRef);
+              }
+            }}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -219,14 +239,12 @@ const PrintQuote = () => {
               <p className="text-gray-600 mt-2 print:mt-1 print:text-xs">
                 <span className="font-medium text-gray-700">Voltagem: </span>
                 <span className="flex items-center mt-1">
-                  <span className="inline-flex items-center mr-4">
-                    <span className={`w-4 h-4 print:w-3 print:h-3 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "110v" ? "bg-black" : "bg-white"}`}></span>
-                    110V
-                  </span>
-                  <span className="inline-flex items-center">
-                    <span className={`w-4 h-4 print:w-3 print:h-3 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "220v" ? "bg-black" : "bg-white"}`}></span>
-                    220V
-                  </span>
+                  <span className={`w-4 h-4 print:w-3 print:h-3 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "110v" ? "bg-black" : "bg-white"}`}></span>
+                  110V
+                </span>
+                <span className="inline-flex items-center">
+                  <span className={`w-4 h-4 print:w-3 print:h-3 border border-gray-400 rounded-sm mr-1 ${quote.voltage === "220v" ? "bg-black" : "bg-white"}`}></span>
+                  220V
                 </span>
               </p>
             </div>
@@ -281,7 +299,6 @@ const PrintQuote = () => {
                   </td>
                 </tr>
               ))}
-              {/* Empty rows for manual filling - reduced number for half-page layout */}
               {[...Array(2)].map((_, index) => (
                 <tr key={`empty-${index}`} className="border-b border-gray-200">
                   <td className="py-2 px-3 print:py-1 print:px-2 border border-gray-300 print:text-xs">&nbsp;</td>

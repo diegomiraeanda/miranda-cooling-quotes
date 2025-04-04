@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Quote } from "@/types";
@@ -31,7 +30,24 @@ const QuoteDetail = () => {
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
     },
-    content: () => printRef.current,
+    onPrintError: (err) => {
+      toast.error("Erro ao imprimir", { description: err?.message });
+    },
+    print: (iframe) => {
+      const document = iframe?.contentDocument;
+      if (document) {
+        const html = document.getElementsByTagName("html")[0];
+        html.style.fontSize = "12px";
+        const promise = new Promise<void>((resolve) => {
+          setTimeout(() => {
+            window.print();
+            resolve();
+          }, 250);
+        });
+        return promise;
+      }
+      return Promise.resolve();
+    }
   });
 
   if (!quote) {
@@ -72,7 +88,11 @@ const QuoteDetail = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={() => handlePrint()}
+            onClick={() => {
+              if (printRef.current) {
+                handlePrint(printRef);
+              }
+            }}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -104,10 +124,10 @@ const QuoteDetail = () => {
                 <h1 className="font-bold text-blue-800 text-xl print:text-sm uppercase tracking-wider print:text-black text-center">
                   {quote.companyInfo?.name || "COMÉRCIO DE REFRIGERAÇÃO MIRANDA LTDA"}
                 </h1>
-                <p className="text-sm print:text-xs text-blue-600 print:text-gray-600 text-center">
+                <p className="text-sm print:text-xs text-blue-600 text-center">
                   {quote.companyInfo?.address || "Av. Principal, 1000 - Centro - CEP: 00000-000"}
                 </p>
-                <p className="text-sm print:text-xs text-blue-600 print:text-gray-600 text-center">
+                <p className="text-sm print:text-xs text-blue-600 text-center">
                   Telefone: {quote.companyInfo?.phone || "(00) 9999-8888"} | CNPJ: {quote.companyInfo?.taxId || "12.345.678/0001-99"}
                 </p>
               </div>

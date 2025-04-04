@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,7 +23,6 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// Define the schema for our form
 const formSchema = z.object({
   customerName: z.string().min(1, { message: "Nome do cliente é obrigatório" }),
   customerAddress: z.string().optional(),
@@ -34,7 +32,6 @@ const formSchema = z.object({
   customerState: z.string().optional(),
   date: z.date({ required_error: "Data é obrigatória" }),
   
-  // Equipment fields
   deviceType: z.string().optional(),
   deviceBrand: z.string().optional(),
   deviceModel: z.string().optional(),
@@ -54,7 +51,6 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Company info (hardcoded as requested)
 const COMPANY_INFO = {
   name: "Refrigeração Miranda",
   shortName: "RM",
@@ -97,7 +93,6 @@ const CreateQuote = () => {
   });
 
   const onSubmit = (data: FormValues) => {
-    // Calculate totals
     const itemsWithTotals = data.items.map(item => ({
       ...item,
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -105,13 +100,10 @@ const CreateQuote = () => {
     }));
     
     const subtotal = itemsWithTotals.reduce((sum, item) => sum + item.total, 0);
-    const tax = subtotal * 0.1; // 10% tax
-    const total = subtotal + tax;
+    const total = subtotal;
     
-    // Create quote object with a new ID
     const newQuoteId = `quote-${Date.now()}`;
     
-    // Create quote object
     const quote = {
       id: newQuoteId,
       number: `ORC-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -123,7 +115,6 @@ const CreateQuote = () => {
       customerCity: data.customerCity || "",
       customerState: data.customerState || "",
       
-      // Device information
       deviceType: data.deviceType || "",
       deviceBrand: data.deviceBrand || "",
       deviceModel: data.deviceModel || "",
@@ -133,11 +124,9 @@ const CreateQuote = () => {
       
       items: itemsWithTotals,
       
-      // Cost breakdown (required fields from the type)
-      partsCost: subtotal, // Default to subtotal for now
-      laborCost: 0,        // Default to 0
+      partsCost: subtotal,
+      laborCost: 0,
       subtotal,
-      tax,
       total,
       notes: data.notes || "",
       status: "draft" as const,
@@ -146,12 +135,10 @@ const CreateQuote = () => {
     
     console.log("Orçamento criado:", quote);
     
-    // Add to our quotes array
     quotes.push(quote);
     
     toast.success("Orçamento criado com sucesso!");
     
-    // Navigate to print view
     navigate(`/print/${newQuoteId}`);
   };
 
@@ -168,7 +155,7 @@ const CreateQuote = () => {
 
   const removeItem = (index: number) => {
     if (items.length === 1) {
-      return; // Don't remove if it's the last item
+      return;
     }
     const newItems = [...items];
     newItems.splice(index, 1);
@@ -187,7 +174,6 @@ const CreateQuote = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      {/* Company Header */}
       <div className="flex items-center bg-white p-4 mb-6 shadow-sm rounded-lg">
         <div className="w-12 h-12 bg-cooling-700 rounded-md flex items-center justify-center">
           <span className="text-white font-bold text-xl">{COMPANY_INFO.shortName}</span>
@@ -343,7 +329,6 @@ const CreateQuote = () => {
               </CardContent>
             </Card>
             
-            {/* Equipment Information */}
             <Card>
               <CardHeader>
                 <CardTitle>Informações do Aparelho</CardTitle>
@@ -571,7 +556,6 @@ const CreateQuote = () => {
                 </CardContent>
               </Card>
 
-              {/* Summary Card */}
               <Card>
                 <CardHeader>
                   <CardTitle>Resumo</CardTitle>
@@ -591,19 +575,6 @@ const CreateQuote = () => {
                         )}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Impostos (10%):</span>
-                      <span>
-                        {new Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(
-                          items.reduce((acc, item, index) => {
-                            return acc + (calculateItemTotal(index) * 0.1);
-                          }, 0)
-                        )}
-                      </span>
-                    </div>
                     <div className="flex justify-between pt-2 text-lg font-bold border-t">
                       <span>Total:</span>
                       <span>
@@ -612,7 +583,7 @@ const CreateQuote = () => {
                           currency: "BRL",
                         }).format(
                           items.reduce((acc, item, index) => {
-                            return acc + (calculateItemTotal(index) * 1.1);
+                            return acc + calculateItemTotal(index);
                           }, 0)
                         )}
                       </span>
@@ -633,6 +604,5 @@ const CreateQuote = () => {
   );
 };
 
-// Export the quotes array so the PrintQuote component can access it
 export { quotes };
 export default CreateQuote;

@@ -52,7 +52,7 @@ export interface Quote {
   waterproofingCost?: number; // Waterproofing cost (optional)
   transportCost?: number;   // Transport fee (optional)
   subtotal: number;
-  tax: number;
+  tax?: number;             // Making tax optional
   total: number;
   
   notes: string;

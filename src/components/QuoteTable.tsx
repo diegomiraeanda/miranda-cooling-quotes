@@ -52,7 +52,10 @@ const QuoteTable = ({ quotes }: QuoteTableProps) => {
               <TableCell>
                 {format(new Date(quote.date), "dd/MM/yyyy", { locale: ptBR })}
               </TableCell>
-              <TableCell>{quote.customer.name}</TableCell>
+              <TableCell>
+                {/* Use customerName field directly or fall back to customer.name if available */}
+                {quote.customerName || (quote.customer && quote.customer.name) || "N/A"}
+              </TableCell>
               <TableCell>
                 {new Intl.NumberFormat("pt-BR", {
                   style: "currency",

@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CreateQuote from "./pages/CreateQuote";
 import PrintQuote from "./pages/PrintQuote";
 import QuoteDetail from "./pages/QuoteDetail";
+import QuotesList from "./pages/QuotesList";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -18,8 +20,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<CreateQuote />} />
+          <Route path="/quotes" element={<QuotesList />} />
           <Route path="/print/:id" element={<PrintQuote />} />
           <Route path="/quotes/:id" element={<QuoteDetail />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

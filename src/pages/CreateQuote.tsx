@@ -139,7 +139,7 @@ const CreateQuote = () => {
     
     toast.success("Orçamento criado com sucesso!");
     
-    navigate(`/print/${newQuoteId}`);
+    navigate(`/quotes/${newQuoteId}`);
   };
 
   const addItem = () => {

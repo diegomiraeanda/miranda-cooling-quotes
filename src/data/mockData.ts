@@ -1,54 +1,108 @@
 
 import { Quote } from "@/types";
 
-// Mock quote data
-export const quotes: Quote[] = [
+// If quotes are exported from CreateQuote.ts, we'll import them
+import { quotes as createdQuotes } from "@/pages/CreateQuote";
+
+// Mock data for customers
+export const customers = [
   {
-    id: "quote-1",
-    number: "ORC-1001",
+    id: "customer-1",
+    name: "João Silva",
+    email: "joao.silva@example.com",
+    phone: "(11) 98765-4321",
+    address: "Rua das Flores, 123",
+    city: "São Paulo",
+    state: "SP",
+  },
+  {
+    id: "customer-2",
+    name: "Maria Oliveira",
+    email: "maria.oliveira@example.com",
+    phone: "(21) 98765-4321",
+    address: "Av. Atlântica, 456",
+    city: "Rio de Janeiro",
+    state: "RJ",
+  },
+];
+
+// Mock data for services
+export const services = [
+  {
+    id: "service-1",
+    name: "Instalação de Ar Condicionado Split",
+    description: "Instalação completa de ar condicionado split incluindo suportes e tubulação.",
+    price: 350.00,
+  },
+  {
+    id: "service-2",
+    name: "Manutenção Preventiva",
+    description: "Limpeza de filtros, verificação de gás e componentes elétricos.",
+    price: 180.00,
+  },
+  {
+    id: "service-3",
+    name: "Reparo de Compressor",
+    description: "Serviço de reparo ou substituição de compressor com garantia.",
+    price: 450.00,
+  },
+];
+
+// Combine created quotes with any pre-defined quotes
+export const quotes = [
+  ...createdQuotes,
+  {
+    id: "quote-sample",
+    number: "ORC-1234",
     date: "2025-04-01",
-    customerId: "cust-1",
-    customerName: "João Silva",
-    customerAddress: "Rua das Flores, 123",
-    customerPhone: "(11) 98765-4321",
-    customerEmail: "joao.silva@email.com",
+    customerName: "Empresa ABC Ltda",
+    customerAddress: "Av. Industrial, 1000",
     customerCity: "São Paulo",
     customerState: "SP",
+    customerPhone: "(11) 3333-4444",
+    customerEmail: "contato@empresaabc.com.br",
     
     deviceType: "Ar Condicionado Split",
-    deviceBrand: "LG",
-    deviceModel: "Inverter Q/F 12000 BTUs",
-    deviceSerialNumber: "LG12345678",
-    purchaseDate: "2023-05-15",
+    deviceBrand: "Consul",
+    deviceModel: "CBA123",
+    deviceSerialNumber: "SN123456789",
+    purchaseDate: "10/01/2023",
     voltage: "220v",
     
     items: [
       {
         id: "item-1",
-        code: "GAS-001",
-        description: "Recarga de gás refrigerante R410A",
+        code: "S001",
+        description: "Instalação de Ar Condicionado Split",
         quantity: 1,
-        unitPrice: 180.00,
-        total: 180.00
+        unitPrice: 350.00,
+        total: 350.00
       },
       {
         id: "item-2",
-        code: "SERV-001",
-        description: "Mão de obra para manutenção preventiva",
+        code: "P001",
+        description: "Suporte para Condensadora",
         quantity: 1,
         unitPrice: 120.00,
         total: 120.00
+      },
+      {
+        id: "item-3",
+        code: "P002",
+        description: "Kit Instalação (3m)",
+        quantity: 1,
+        unitPrice: 85.00,
+        total: 85.00
       }
     ],
     
-    partsCost: 180.00,       // Added missing property
-    laborCost: 120.00,       // Added missing property
-    transportCost: 50.00,
-    waterproofingCost: 80.00,
-    subtotal: 430.00,
-    total: 430.00,           // Removed tax from calculation
-    
-    notes: "Cliente relatou baixa refrigeração. Verificar possível vazamento.",
+    partsCost: 205.00,
+    laborCost: 350.00,
+    waterproofingCost: 50.00,
+    transportCost: 30.00,
+    subtotal: 635.00,
+    total: 635.00,
+    notes: "Instalação com agendamento prévio. Garantia de 3 meses para o serviço.",
     status: "approved",
     companyInfo: {
       name: "Refrigeração Miranda",
@@ -56,115 +110,7 @@ export const quotes: Quote[] = [
       address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
       phone: "(00) 9999-8888",
       email: "contato@refrigeracaomiranda.com.br",
-      taxId: "12.345.678/0001-99"
-    }
-  },
-  {
-    id: "quote-2",
-    number: "ORC-1002",
-    date: "2025-04-02",
-    customerId: "cust-2",
-    customerName: "Maria Santos",
-    customerAddress: "Av. Brasil, 456",
-    customerPhone: "(11) 91234-5678",
-    customerEmail: "maria.santos@email.com",
-    customerCity: "Rio de Janeiro",
-    customerState: "RJ",
-    
-    deviceType: "Geladeira",
-    deviceBrand: "Brastemp",
-    deviceModel: "Frost Free 400L",
-    deviceSerialNumber: "BRM45XYZ",
-    purchaseDate: "2022-08-10",
-    voltage: "110v",
-    
-    items: [
-      {
-        id: "item-3",
-        code: "COMP-001",
-        description: "Compressor novo",
-        quantity: 1,
-        unitPrice: 550.00,
-        total: 550.00
-      },
-      {
-        id: "item-4",
-        code: "SERV-002",
-        description: "Substituição de compressor",
-        quantity: 1,
-        unitPrice: 250.00,
-        total: 250.00
-      }
-    ],
-    
-    partsCost: 550.00,       // Added missing property
-    laborCost: 250.00,       // Added missing property
-    subtotal: 800.00,
-    total: 800.00,           // Removed tax from calculation
-    
-    notes: "Geladeira não refrigera. Compressor com defeito.",
-    status: "sent",
-    companyInfo: {
-      name: "Refrigeração Miranda",
-      shortName: "RM",
-      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
-      phone: "(00) 9999-8888",
-      email: "contato@refrigeracaomiranda.com.br",
-      taxId: "12.345.678/0001-99"
-    }
-  },
-  {
-    id: "quote-3",
-    number: "ORC-1003",
-    date: "2025-04-03",
-    customerId: "cust-3",
-    customerName: "Pedro Oliveira",
-    customerAddress: "Rua Ipiranga, 789",
-    customerPhone: "(11) 97777-8888",
-    customerEmail: "pedro.oliveira@email.com",
-    customerCity: "Belo Horizonte",
-    customerState: "MG",
-    
-    deviceType: "Freezer",
-    deviceBrand: "Consul",
-    deviceModel: "Horizontal 500L",
-    deviceSerialNumber: "CHN50ABC",
-    purchaseDate: "2021-11-20",
-    voltage: "220v",
-    
-    items: [
-      {
-        id: "item-5",
-        code: "TERM-001",
-        description: "Termostato",
-        quantity: 1,
-        unitPrice: 120.00,
-        total: 120.00
-      },
-      {
-        id: "item-6",
-        code: "SERV-003",
-        description: "Instalação de termostato",
-        quantity: 1,
-        unitPrice: 80.00,
-        total: 80.00
-      }
-    ],
-    
-    partsCost: 120.00,       // Added missing property
-    laborCost: 80.00,        // Added missing property
-    subtotal: 200.00,
-    total: 200.00,           // Removed tax from calculation
-    
-    notes: "Freezer não mantém temperatura. Termostato com defeito.",
-    status: "draft",
-    companyInfo: {
-      name: "Refrigeração Miranda",
-      shortName: "RM",
-      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
-      phone: "(00) 9999-8888",
-      email: "contato@refrigeracaomiranda.com.br",
-      taxId: "12.345.678/0001-99"
+      taxId: "CNPJ: 12.345.678/0001-99"
     }
   }
 ];

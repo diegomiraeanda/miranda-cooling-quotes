@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Printer, Download } from "lucide-react";
@@ -26,7 +25,6 @@ const PrintQuote = () => {
   }, [id]);
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
     documentTitle: `Orçamento-${quote?.number || ""}`,
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
@@ -73,7 +71,7 @@ const PrintQuote = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={handlePrint}
+            onClick={() => printRef.current && handlePrint()}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />

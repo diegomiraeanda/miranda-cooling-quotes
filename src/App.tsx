@@ -9,6 +9,7 @@ import PrintQuote from "./pages/PrintQuote";
 import QuoteDetail from "./pages/QuoteDetail";
 import QuotesList from "./pages/QuotesList";
 import NotFound from "./pages/NotFound";
+import Layout from "./components/Layout"; // Add this import
 
 const queryClient = new QueryClient();
 
@@ -18,16 +19,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<CreateQuote />} />
-          <Route path="/quotes" element={<QuotesList />} />
-          <Route path="/print/:id" element={<PrintQuote />} />
-          <Route path="/quotes/:id" element={<QuoteDetail />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Layout> {/* Wrap routes with Layout */}
+          <Routes>
+            <Route path="/" element={<CreateQuote />} />
+            <Route path="/quotes" element={<QuotesList />} />
+            <Route path="/quotes/new" element={<CreateQuote />} /> {/* Add this route */}
+            <Route path="/print/:id" element={<PrintQuote />} />
+            <Route path="/quotes/:id" element={<QuoteDetail />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
+

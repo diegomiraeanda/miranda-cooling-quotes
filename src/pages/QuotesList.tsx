@@ -9,16 +9,21 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import QuoteTable from "@/components/QuoteTable";
-import { quotes } from "@/data/mockData";
-import { useState } from "react";
+import { quotes as mockQuotes } from "@/data/mockData";
+import { useState, useEffect } from "react";
 import { Quote } from "@/types";
 import { Link } from "react-router-dom";
 import { Plus, Search } from "lucide-react";
 
 const QuotesList = () => {
-  const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>(quotes);
+  const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  useEffect(() => {
+    console.log("Available quotes:", mockQuotes);
+    setFilteredQuotes(mockQuotes);
+  }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value;
@@ -32,7 +37,7 @@ const QuotesList = () => {
   };
 
   const filterQuotes = (term: string, status: string) => {
-    let filtered = [...quotes];
+    let filtered = [...mockQuotes];
 
     // Filter by search term
     if (term) {
@@ -40,7 +45,7 @@ const QuotesList = () => {
       filtered = filtered.filter(
         (quote) =>
           quote.number.toLowerCase().includes(lowerTerm) ||
-          quote.customer.name.toLowerCase().includes(lowerTerm)
+          (quote.customerName || "").toLowerCase().includes(lowerTerm)
       );
     }
 

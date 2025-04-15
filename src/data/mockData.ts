@@ -1,8 +1,15 @@
 
 import { Quote } from "@/types";
 
-// If quotes are exported from CreateQuote.ts, we'll import them
-import { quotes as createdQuotes } from "@/pages/CreateQuote";
+// Import all quotes from CreateQuote if they exist
+let createdQuotes: Quote[] = [];
+try {
+  const imports = require("@/pages/CreateQuote");
+  createdQuotes = imports.quotes || [];
+} catch (error) {
+  console.error("Could not import quotes from CreateQuote:", error);
+  createdQuotes = [];
+}
 
 // Mock data for customers
 export const customers = [
@@ -48,69 +55,69 @@ export const services = [
   },
 ];
 
-// Combine created quotes with any pre-defined quotes
-export const quotes = [
-  ...createdQuotes,
-  {
-    id: "quote-sample",
-    number: "ORC-1234",
-    date: "2025-04-01",
-    customerName: "Empresa ABC Ltda",
-    customerAddress: "Av. Industrial, 1000",
-    customerCity: "São Paulo",
-    customerState: "SP",
-    customerPhone: "(11) 3333-4444",
-    customerEmail: "contato@empresaabc.com.br",
-    
-    deviceType: "Ar Condicionado Split",
-    deviceBrand: "Consul",
-    deviceModel: "CBA123",
-    deviceSerialNumber: "SN123456789",
-    purchaseDate: "10/01/2023",
-    voltage: "220v",
-    
-    items: [
-      {
-        id: "item-1",
-        code: "S001",
-        description: "Instalação de Ar Condicionado Split",
-        quantity: 1,
-        unitPrice: 350.00,
-        total: 350.00
-      },
-      {
-        id: "item-2",
-        code: "P001",
-        description: "Suporte para Condensadora",
-        quantity: 1,
-        unitPrice: 120.00,
-        total: 120.00
-      },
-      {
-        id: "item-3",
-        code: "P002",
-        description: "Kit Instalação (3m)",
-        quantity: 1,
-        unitPrice: 85.00,
-        total: 85.00
-      }
-    ],
-    
-    partsCost: 205.00,
-    laborCost: 350.00,
-    waterproofingCost: 50.00,
-    transportCost: 30.00,
-    subtotal: 635.00,
-    total: 635.00,
-    notes: "Instalação com agendamento prévio. Garantia de 3 meses para o serviço.",
-    status: "approved",
-    companyInfo: {
-      name: "Refrigeração Miranda",
-      shortName: "RM",
-      address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
-      phone: "(00) 9999-8888",
-      email: "contato@refrigeracaomiranda.com.br",
-      taxId: "CNPJ: 12.345.678/0001-99"
+// Sample quote to ensure we have at least one in the list
+const sampleQuote: Quote = {
+  id: "quote-sample",
+  number: "ORC-1234",
+  date: "2025-04-01",
+  customerName: "Empresa ABC Ltda",
+  customerAddress: "Av. Industrial, 1000",
+  customerCity: "São Paulo",
+  customerState: "SP",
+  customerPhone: "(11) 3333-4444",
+  customerEmail: "contato@empresaabc.com.br",
+  
+  deviceType: "Ar Condicionado Split",
+  deviceBrand: "Consul",
+  deviceModel: "CBA123",
+  deviceSerialNumber: "SN123456789",
+  purchaseDate: "10/01/2023",
+  voltage: "220v",
+  
+  items: [
+    {
+      id: "item-1",
+      code: "S001",
+      description: "Instalação de Ar Condicionado Split",
+      quantity: 1,
+      unitPrice: 350.00,
+      total: 350.00
+    },
+    {
+      id: "item-2",
+      code: "P001",
+      description: "Suporte para Condensadora",
+      quantity: 1,
+      unitPrice: 120.00,
+      total: 120.00
+    },
+    {
+      id: "item-3",
+      code: "P002",
+      description: "Kit Instalação (3m)",
+      quantity: 1,
+      unitPrice: 85.00,
+      total: 85.00
     }
+  ],
+  
+  partsCost: 205.00,
+  laborCost: 350.00,
+  waterproofingCost: 50.00,
+  transportCost: 30.00,
+  subtotal: 635.00,
+  total: 635.00,
+  notes: "Instalação com agendamento prévio. Garantia de 3 meses para o serviço.",
+  status: "approved",
+  companyInfo: {
+    name: "Refrigeração Miranda",
+    shortName: "RM",
+    address: "Av. Principal, 1000 - Centro - CEP: 00000-000",
+    phone: "(00) 9999-8888",
+    email: "contato@refrigeracaomiranda.com.br",
+    taxId: "CNPJ: 12.345.678/0001-99"
   }
-];
+};
+
+// Combine created quotes with the sample quote
+export const quotes = [...createdQuotes, sampleQuote];

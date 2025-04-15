@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Quote } from "@/types";
@@ -9,7 +10,7 @@ import { Link, useParams } from "react-router-dom";
 import StatusBadge from "@/components/StatusBadge";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
-import { quotes } from "@/data/mockData";
+import { quotes as mockQuotes } from "@/data/mockData";
 
 const QuoteDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,14 +19,17 @@ const QuoteDetail = () => {
 
   useEffect(() => {
     // Find quote in our mock data
-    const foundQuote = quotes.find((q) => q.id === id);
+    const foundQuote = mockQuotes.find((q) => q.id === id);
     
     if (foundQuote) {
       setQuote(foundQuote);
+    } else {
+      console.error(`Quote with ID ${id} not found in available quotes:`, mockQuotes.map(q => q.id));
     }
   }, [id]);
 
   const handlePrint = useReactToPrint({
+    content: () => printRef.current,
     documentTitle: `Orçamento-${quote?.number || ""}`,
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");

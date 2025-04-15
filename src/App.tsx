@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CreateQuote from "./pages/CreateQuote";
 import PrintQuote from "./pages/PrintQuote";
+import QuoteDetail from "./pages/QuoteDetail";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<CreateQuote />} />
           <Route path="/print/:id" element={<PrintQuote />} />
+          <Route path="/quotes/:id" element={<QuoteDetail />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

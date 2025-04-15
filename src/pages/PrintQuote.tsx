@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Printer, Download } from "lucide-react";
@@ -25,27 +26,13 @@ const PrintQuote = () => {
   }, [id]);
 
   const handlePrint = useReactToPrint({
+    content: () => printRef.current,
     documentTitle: `Orçamento-${quote?.number || ""}`,
     onAfterPrint: () => {
       toast.success("Orçamento enviado para impressão");
     },
-    onPrintError: (err) => {
-      toast.error("Erro ao imprimir", { description: err?.message });
-    },
-    print: (iframe) => {
-      const document = iframe?.contentDocument;
-      if (document) {
-        const html = document.getElementsByTagName("html")[0];
-        html.style.fontSize = "12px";
-        const promise = new Promise<void>((resolve) => {
-          setTimeout(() => {
-            window.print();
-            resolve();
-          }, 250);
-        });
-        return promise;
-      }
-      return Promise.resolve();
+    onPrintError: () => {
+      toast.error("Erro ao imprimir");
     }
   });
 
@@ -86,11 +73,7 @@ const PrintQuote = () => {
         <div className="flex space-x-3">
           <Button
             variant="outline"
-            onClick={() => {
-              if (printRef.current) {
-                handlePrint(printRef);
-              }
-            }}
+            onClick={handlePrint}
             className="flex items-center"
           >
             <Printer className="mr-2 h-4 w-4" />
